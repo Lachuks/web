@@ -1,13 +1,7 @@
 <template>
-    <div class="container shadow-lg p-4 mb-5 bg-white rounded mt-5">
-        <h3 class="mb-4 text-center">Your Note</h3>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Your Note's Title</label>
-            <div class="p-2 border rounded bg-light" id="title"></div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Your Note's Main Content</label>
-            <div class="p-3 border rounded bg-light" id="content"></div>
+    <div class="container mb-5 mt-5">
+        <h3 class="mb-4 text-center">Manas piezīmes</h3>
+        <div id="notes-container" class="text-center">
         </div>
     </div>
 </template>
@@ -16,8 +10,40 @@
 import { onMounted } from 'vue';
 
 function loadData() {
-    document.getElementById("title").textContent = sessionStorage.getItem("title");
-    document.getElementById("content").textContent = sessionStorage.getItem("content");
+    const notes = JSON.parse(sessionStorage.getItem("notes")) || [];
+    const notesContainer = document.getElementById("notes-container");
+
+    notesContainer.innerHTML = "";
+    if (notes.length === 0) {
+        notesContainer.innerHTML = `<p class="text-muted">Nav piezīmju.</p>`;
+        return;
+    }
+    notes.forEach((note, index) => {
+        const noteElement = document.createElement("div");
+        noteElement.className = "mb-4 p-3 border rounded bg-white text-start";
+        noteElement.innerHTML = `
+            <p><strong>Temats:</strong> ${note.title}</p>
+            <p><strong>Piezīme:</strong> ${note.content}</p>
+            <button class="btn btn-danger btn-sm mt-2" data-index="${index}">Dzēst</button>
+        `;
+
+        notesContainer.appendChild(noteElement);
+    });
+
+    const deleteButtons = notesContainer.querySelectorAll("button[data-index]");
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const noteIndex = event.target.getAttribute("data-index");
+            deleteNote(noteIndex);
+        });
+    });
+}
+
+function deleteNote(index) {
+    const notes = JSON.parse(sessionStorage.getItem("notes")) || [];
+    notes.splice(index, 1);
+    sessionStorage.setItem("notes", JSON.stringify(notes));
+    loadData();
 }
 
 onMounted(() => {

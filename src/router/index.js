@@ -12,12 +12,12 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/note',
+      path: '/write-note',
       name: 'note',
       component: NoteView,
     },
     {
-      path: '/display-note',
+      path: '/view-notes',
       name: 'displayNote',
       component: DisplayNoteView,
     },
